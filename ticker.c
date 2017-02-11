@@ -13,13 +13,20 @@ main(){
    while(1){
    char string[LENGTH]= "";
 
-   addquote(string, "jnug");
-   addquote(string, "nugt");
-   addquote(string, "rgld");
+   addquote(string, "JNUG");
+   addquote(string, "NUGT");
+   addquote(string, "RGLD");
    addquote(string, "GOLD");
+   addquote(string, "AU");
+   addquote(string, "AG");
+   addquote(string, "AUY");
+   addquote(string, "SA");
+   addquote(string, "GDX");
+   addquote(string, "IAG");
+   addquote(string, "EGO");
 
-   int i;
-   for(i = 0;i<30;i++)
+   int i = 1; //number of times to loop before refreshing
+   for(i = 0;i!=1;i--)
       rotate(string);
    }
 }
