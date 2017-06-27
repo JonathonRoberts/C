@@ -55,18 +55,21 @@ int main(int argc, char *argv[]){
 		printf("File doesn't exist\n");
 	}
 	char a;
+/*
+input:
+	goto input;
+	*/
 
 
 	//read file
 	fp=fopen(fname,"r+");
 	int n = 0, i = 0;
-	int openfile[2000]; // should use malloc to grow array when needed
-
-	int lines[2000];
+	char openfile[20000]; //array for whole file
+	int lines[2000]; //array for positions of new lines
 	lines[0]=0;
-	int lc=0;
-	int characters=0;
-	while( fscanf(fp, "%c,", &n) > 0 )
+	int lc=0;//line count
+	int characters=0;//total characters
+	while( fscanf(fp, "%c", &n) >0 )
 	{
 		characters++;
 		printf("%c",n);
@@ -74,46 +77,63 @@ int main(int argc, char *argv[]){
 		openfile[i++] = n;
 	}
 
-	/*
-	while((a = getachar())!=27){
-		switch(a){
-			case 13: {fprintf(fp,"\n");printf("\n");break;}
-			case 27: {break;}
-			default: {fprintf(fp,"%c", a);printf("%c",a);}
-		}
-	}
-	*/
 	//write entry into temp array
 	char tmp[2000];
 	n = 0;
 	int newcharcount=0;
-	while((a = getachar())!=27){
-		switch(a){
-			case 13: {tmp[n++]= '\n';printf("\n");newcharcount++;break;}
-			case 27: {break;}
-			default: {tmp[n++] = a;printf("%c",a);newcharcount++;}
-		}
-	}
-	//merge into edit point
-	int editpoint =3;
+	int breakvar = 1;
+	int editpoint =0;
 	int fclose(FILE *a_file);
 	fp=fopen(fname,"w");
 	char aoeu=0;
 	int counter1;
-	for(counter1 = 0;counter1<=characters;counter1++){
-		while(counter1>editpoint&&aoeu<newcharcount){
-			printf("%c",tmp[aoeu]);
-			fprintf(fp,"%c",tmp[aoeu++]);
+	int addedit =0;
+	a = 2;
+	while(breakvar == 1){
+		switch(addedit){
+			case 0: break;
+			case 1: {editpoint++;break;}
+			case 2: {editpoint++;break;}
+			case 3: {editpoint++;break;}
+			case 4: {editpoint++;break;}
 		}
-		fprintf(fp,"%c",openfile[counter1]);
-		printf("%c",openfile[counter1]);
+		while(a!=27){
+			switch(a=getachar()){
+				case 13: {tmp[n++]= '\n';printf("\n");newcharcount++;break;}
+				case 27: {
+						switch(getachar()) { // the real value
+							case 27 : {a= 27;breakvar--;break;}
+							case 'A': {printf("UP\n");break;}// code for arrow up
+							case 'B': {printf("%c",a);break;}// code for arrow down
+							case 'C': {addedit++;break;}// code for arrow right
+							case 'D': {printf("%c",a);break;}// code for arrow left
+						}break;}
+				default: {tmp[n++] = a;printf("%c",a);newcharcount++;}
+			}
+		}
+
+		//merge into edit point
+		int fclose(FILE *a_file);
+		fp=fopen(fname,"w");
+		aoeu=0;
+		if(newcharcount!=0){
+			for(counter1 = 0;counter1<=characters;counter1++){
+				while(counter1>editpoint&&aoeu<newcharcount){
+					printf("%c",tmp[aoeu]);
+					fprintf(fp,"%c",tmp[aoeu++]);
+				}
+				fprintf(fp,"%c",openfile[counter1]);
+				printf("%c",openfile[counter1]);
+			}
+		}
+		else{
+			while( fscanf(fp, "%c", &n) >0 )
+				printf("c",n);
+		}
+		int fclose(FILE *a_file);
+		a = 0;
 	}
 
-
-
-
-
-	int fclose(FILE *a_file);
    return 1;
 }
 
