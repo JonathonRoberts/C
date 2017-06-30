@@ -53,8 +53,8 @@ int main(int argc, char *argv[]){
 			printf("%.2f\t%.2f\n",odds[i],(returncash/odds[i]));
 		}
 		printf("Input total stake: ");
-		}
 	}
+}
 
 float setreturn(int noods, float odds[]){
 	int i;
