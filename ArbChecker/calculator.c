@@ -21,11 +21,9 @@ int main(int argc, char *argv[]){
 			char oddstring[20];
 			char comstring[20];
 			if(sscanf(argv[i],"%[.-9]-%[.-9^/]",oddstring,comstring)==2){
-				printf("using strings %s and %s\n",oddstring, comstring);
 				odds[i-1] = atof(oddstring)*(1-(atof(comstring)/100));
 			}
 			else if(sscanf(argv[i],"%[.-9^/]",oddstring)==1){
-				printf("using strings %s\n",oddstring);
 				odds[i-1] = atof(oddstring);
 			}
 			else{
