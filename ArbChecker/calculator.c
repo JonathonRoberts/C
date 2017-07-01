@@ -8,15 +8,33 @@ void changeodds(int *noodds, float *op);
 int main(int argc, char *argv[]){
 	int i;
 	int noodds = argc-1;//number of odds
-	if(noodds<2){
-		printf("Two or more odds required\n");
-		return 0;
-	}
 	float odds[20];
 	float *op;//odds pointer required for changeodds()
 	op = odds;
-	for(i=1;i<argc;i++){
-		odds[i-1] = atof(argv[i]);
+	if(noodds<2){
+		system("clear");
+		printf("Two or more odds required\n");
+		changeodds(&noodds,op);
+	}
+	else{
+		for(i=1;i<argc;i++){
+			char oddstring[20];
+			char comstring[20];
+			if(sscanf(argv[i],"%[.-9]-%[.-9^/]",oddstring,comstring)==2){
+				printf("using strings %s and %s\n",oddstring, comstring);
+				odds[i-1] = atof(oddstring)*(1-(atof(comstring)/100));
+			}
+			else if(sscanf(argv[i],"%[.-9^/]",oddstring)==1){
+				printf("using strings %s\n",oddstring);
+				odds[i-1] = atof(oddstring);
+			}
+			else{
+				printf("Invalid input\n");
+				changeodds(&noodds,op);
+			}
+			oddstring[0]=0;
+			comstring[0]=0;
+		}
 	}
 	float returnodds = setreturn(noodds, odds);
 	float totalstake = 100;
@@ -67,17 +85,34 @@ float setreturn(int noods, float odds[]){
 
 void changeodds(int *noodds, float *op){
 	char str[60];
+	char *p;
+	char tmpword[10];
+	char oddstring[10];
+	char comstring[10];
+	printf("To add a commission, place it after the outcome seperated by \"-\"\ne.g: 2.75-2 2.8 3\n");
 	do{
 		printf("Enter odds seperated by a space: ");
 		*noodds = 0;
-		char *p = str;
-		char tmpword[10];
 		if (fgets(str, sizeof str, stdin) != NULL) {
+			p = str;
 			while (sscanf(p, "%s",tmpword ) != -1) {
-				op[(*noodds)++] = atof(tmpword);
-				p+= strlen(tmpword)+1;
-
+				if(sscanf(tmpword,"%[.-9^/]-%[.-9^/]",oddstring,comstring)==2){
+					op[(*noodds)++] = atof(oddstring)*(1-(atof(comstring)/100));
+				}
+				else if(sscanf(tmpword,"%[.-9^/]",oddstring)==1){
+					op[(*noodds)++] = atof(oddstring);
+				}
+				else{//invalid input
+					str[0]=0;
+					*noodds=0;
+					continue;
+				}
+					p+= strlen(tmpword)+1;
+					oddstring[0] = 0;
+					comstring[0] = 0;
 			  }
 		}
+		if(*noodds<2)
+			printf("Invalid input\n");
 	}while((*noodds)<2);
 }
