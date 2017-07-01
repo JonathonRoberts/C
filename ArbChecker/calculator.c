@@ -65,6 +65,7 @@ int main(int argc, char *argv[]){
 		printf("c - change odds : q - quit\n");
 		printf("Total stake: %.2f\n",totalstake);
 		printf("Total return:  %.2f\n",returncash);
+		printf("Odds\tStake\n");
 		for(i = 0;i<noodds;i++){
 			printf("%.2f\t%.2f\n",odds[i],(returncash/odds[i]));
 		}
