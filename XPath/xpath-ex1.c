@@ -5,7 +5,7 @@ xmlNodeSetPtr getnodeset(xmlDocPtr doc,xmlChar *xpath);
 
 int main(){
 	xmlInitParser();
-	char *docname = "sitemap.xml";
+	char *docname = "Sitemap.xml";
 	//char *expr = "/*:sitemapindex/*:sitemap/*:loc";//xpath2 syntax
 	char *expr = "/*[local-name() = 'sitemapindex']/*[local-name() = 'sitemap']/*[local-name() = 'loc']";
 	int i;
