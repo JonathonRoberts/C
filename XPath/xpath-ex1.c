@@ -5,8 +5,9 @@ xmlNodeSetPtr getnodeset(xmlDocPtr doc,xmlChar *xpath);
 
 int main(){
 	xmlInitParser();
-	char *docname = "sample.xml";
-	char *expr = "/books/book[@id=\"8901\"]/edition[text()]";
+	char *docname = "sitemap.xml";
+	//char *expr = "/*:sitemapindex/*:sitemap/*:loc";//xpath2 syntax
+	char *expr = "/*[local-name() = 'sitemapindex']/*[local-name() = 'sitemap']/*[local-name() = 'loc']";
 	int i;
 	int size;
 
@@ -15,19 +16,19 @@ int main(){
 	xmlNodeSetPtr nodeset;
 	xmlXPathObjectPtr result;
 	xmlChar *element;
-
-	result =getnodeset(doc,xpath);
+	result = getnodeset(doc,xpath);
 
 	if(result){
 		nodeset = result->nodesetval;
-		size = nodeset->nodeNr;
+		printf("Found %i elements:\n",size = nodeset->nodeNr);
 		for(i=0;i<size;i++){
 			element = xmlNodeListGetString(doc,nodeset->nodeTab[i]->xmlChildrenNode,1);
-			printf("Element: %s\n",element);
+			printf("%s\n",element);
 			xmlFree(element);
 		}
 		xmlXPathFreeObject(result);
 	}
+
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
 	return 1;
