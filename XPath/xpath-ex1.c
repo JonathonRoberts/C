@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <libxml/xpath.h>
 
+/* An example XPath program for returning elements from an XML file */
+
 xmlNodeSetPtr getnodeset(xmlDocPtr doc,xmlChar *xpath);
 
 int main(){
