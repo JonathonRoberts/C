@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <libxml/xpath.h>
 #include <libxml/HTMLparser.h>//htmlReadFile
+#include "ezcurl.c"
+
 
 
 /* An example XPath program for returning elements from an XML file */
@@ -9,25 +11,21 @@ xmlNodeSetPtr getnodeset(xmlDocPtr doc,xmlChar *xpath);
 
 int main(){
 	xmlInitParser();
-	//char *docname = "riseup.html";
-	char *docname = "Sitemap.xml";
-	//char *expr = "/*:sitemapindex/*:sitemap/*:loc";//xpath2 syntax
-	char *expr = "/*[local-name() = 'sitemapindex']/*[local-name() = 'sitemap']/*[local-name() = 'loc']";
-	//char *expr = "/html/head/title";
+	//char *docname = "Sitemap.xml";
+	//char *expr = "/*:sitemapindex/*:sitemap/*:loc";//xpath2 syntax for ignoring namespace
+	//char *expr = "/*[local-name() = 'sitemapindex']/*[local-name() = 'sitemap']/*[local-name() = 'loc']";//xpath1 syntax for ignoring namespace
+	char *expr = "/html/head/title";
 	int i;
 	int size;
-
 	/*
-	For reading html files
-	xmlDocPtr doc = htmlReadFile(docname, NULL, HTML_PARSE_NOBLANKS | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING | HTML_PARSE_NONET);
-
-	figure out how to get curl into the program and then find out what goes there
-
-	xmlDocPtr doc = htmlParseDoc(whatgoeshere, NULL, HTML_PARSE_NOBLANKS | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING | HTML_PARSE_NONET);
-
-	xmlDocPtr doc = xmlParseDoc(whatgoeshere);
-	*/
+	For downloading and parsing xml websites
+	xmlDocPtr doc = xmlParseDoc(ezcurl("https://www.sitemaps.org/sitemap.xml");
+	For parsing xml files
 	xmlDocPtr doc = xmlParseFile(docname);
+	For parsing html files
+	xmlDocPtr doc = htmlReadFile(docname, NULL, HTML_PARSE_NOBLANKS | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING | HTML_PARSE_NONET);
+	For downloading and parsing html sites*/
+	xmlDocPtr doc = htmlParseDoc(ezcurl("example.com"),NULL);
 	xmlChar *xpath = (xmlChar*) expr;
 	xmlNodeSetPtr nodeset;
 	xmlXPathObjectPtr result;

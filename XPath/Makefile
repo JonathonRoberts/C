@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS +=-c `xml2-config --cflags` -Wall
-LIBS=`xml2-config --libs`
+CFLAGS +=-c `xml2-config --cflags` `curl-config --cflags` -Wall
+LIBS=`xml2-config --libs` `curl-config --libs`
 SOURCES = xpath-ex1.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=a.out
