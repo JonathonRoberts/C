@@ -2,6 +2,7 @@
 #include <libxml/xpath.h>
 #include <libxml/HTMLparser.h>/*htmlReadFile*/
 #include "ezcurl.c"
+//#include <iconv.h>
 
 
 
@@ -9,9 +10,9 @@
 
 xmlNodeSetPtr getnodeset(xmlDocPtr doc,xmlChar *xpath);
 
-int main(){
+int extern ezXPathHTML(char *website,char *expr,char *output[]){
 	xmlInitParser();
-	char *expr = "/html/head/title";
+	//char *expr = "/html/head/title";
 	int i;
 	int size;
 	/*
@@ -33,7 +34,8 @@ int main(){
 	 * xmlDocPtr doc = htmlReadFile(docname, NULL, HTML_PARSE_NOBLANKS | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING | HTML_PARSE_NONET);
 	 *
 	 * For downloading and parsing html sites */
-	xmlDocPtr doc = htmlParseDoc(ezcurl("example.com"),NULL);
+	//xmlDocPtr doc = htmlParseDoc(ezcurl("example.com"),NULL);
+	xmlDocPtr doc = htmlParseDoc(ezcurl(website),NULL);
 	xmlChar *xpath = (xmlChar*) expr;
 	xmlNodeSetPtr nodeset;
 	xmlXPathObjectPtr result;
@@ -42,10 +44,16 @@ int main(){
 
 	if(result){
 		nodeset = result->nodesetval;
-		printf("Found %i elements:\n",size = nodeset->nodeNr);
+		size = nodeset->nodeNr;
+		//iconv_t foo = iconv_open("UTF-8", "ISO-8859-1");
+		//size_t ibl = 1; // len of iso
+		//size_t obl = 1; // len of converted
 		for(i=0;i<size;i++){
 			element = xmlNodeListGetString(doc,nodeset->nodeTab[i]->xmlChildrenNode,1);
-			printf("%s\n",element);
+			output[i] = element;
+			//iconv(foo, &element, &ibl, &output[i], &obl);
+			printf("%s",output[i]);
+			//strcat(output[i],0);
 			xmlFree(element);
 		}
 		xmlXPathFreeObject(result);
@@ -53,7 +61,7 @@ int main(){
 
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
-	return 1;
+	return size;
 }
 
 xmlNodeSetPtr getnodeset(xmlDocPtr doc,xmlChar *xpath){
