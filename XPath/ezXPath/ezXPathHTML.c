@@ -9,7 +9,6 @@ xmlNodeSetPtr getnodeset(xmlDocPtr doc,xmlChar *xpath);
 
 int extern ezXPathHTML(char *website,char *expr,char *output[]){
 	xmlInitParser();
-	//char *expr = "/html/head/title";
 	int i;
 	int size;
 	/*
@@ -31,20 +30,22 @@ int extern ezXPathHTML(char *website,char *expr,char *output[]){
 	 * xmlDocPtr doc = htmlReadFile(docname, NULL, HTML_PARSE_NOBLANKS | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING | HTML_PARSE_NONET);
 	 *
 	 * For downloading and parsing html sites */
-	//xmlDocPtr doc = htmlParseDoc(ezcurl("example.com"),NULL);
-	xmlDocPtr doc = htmlParseDoc(ezcurl(website),NULL);
+	xmlDocPtr doc = htmlReadDoc(ezcurl(website),website,NULL, HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING | HTML_PARSE_NONET | HTML_PARSE_IGNORE_ENC );
 	xmlChar *xpath = (xmlChar*) expr;
 	xmlNodeSetPtr nodeset;
 	xmlXPathObjectPtr result;
 	xmlChar *element;
 	result = getnodeset(doc,xpath);
+	*output = malloc(0);
 
 	if(result){
 		nodeset = result->nodesetval;
 		size = nodeset->nodeNr;
+		*output = malloc(size);
 		for(i=0;i<size;i++){
 			element = xmlNodeListGetString(doc,nodeset->nodeTab[i]->xmlChildrenNode,1);
-			sscanf(element, "%[^0]",output[i]);/* converts (xmlchar *)element into a regular c string */
+			output[i] = malloc(strlen(element));
+			strxfrm(output[i],element,strlen(element)+1);
 			xmlFree(element);
 		}
 		xmlXPathFreeObject(result);
@@ -52,6 +53,7 @@ int extern ezXPathHTML(char *website,char *expr,char *output[]){
 
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
+
 	return size;
 }
 
