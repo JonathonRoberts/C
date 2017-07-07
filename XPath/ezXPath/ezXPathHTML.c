@@ -2,9 +2,6 @@
 #include <libxml/xpath.h>
 #include <libxml/HTMLparser.h>/*htmlReadFile*/
 #include "ezcurl.c"
-//#include <iconv.h>
-
-
 
 /* An example XPath program for returning elements from an XML file */
 
@@ -45,15 +42,9 @@ int extern ezXPathHTML(char *website,char *expr,char *output[]){
 	if(result){
 		nodeset = result->nodesetval;
 		size = nodeset->nodeNr;
-		//iconv_t foo = iconv_open("UTF-8", "ISO-8859-1");
-		//size_t ibl = 1; // len of iso
-		//size_t obl = 1; // len of converted
 		for(i=0;i<size;i++){
 			element = xmlNodeListGetString(doc,nodeset->nodeTab[i]->xmlChildrenNode,1);
-			output[i] = element;
-			//iconv(foo, &element, &ibl, &output[i], &obl);
-			printf("%s",output[i]);
-			//strcat(output[i],0);
+			sscanf(element, "%[^0]",output[i]);/* converts (xmlchar *)element into a regular c string */
 			xmlFree(element);
 		}
 		xmlXPathFreeObject(result);
