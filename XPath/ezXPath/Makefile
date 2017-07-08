@@ -1,4 +1,4 @@
-CC=gcc
+CC=cc
 CFLAGS +=-c `xml2-config --cflags` `curl-config --cflags` -Wall
 LIBS=`xml2-config --libs` `curl-config --libs`
 SOURCES = main.c

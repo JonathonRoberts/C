@@ -6,11 +6,61 @@
 /* An example XPath program for returning elements from an XML file */
 
 xmlNodeSetPtr getnodeset(xmlDocPtr doc,xmlChar *xpath);
+int extern ezXPathXML(char *website,char *expr,char *output[]){
+	//xmlInitParser();
+	int i;
+	int size = 0;
+	/*
+	 *
+	 * xpath1 syntax for ignoring namespace
+	 * char *expr = "/*[local-name() = 'sitemapindex']/*[local-name() = 'sitemap']/*[local-name() = 'loc']";
+	 * xpath2 syntax for ignoring namespace
+	 * char *expr = "/*:sitemapindex/*:sitemap/*:loc";
+	 *
+	 * char *docname = "Sitemap.xml";
+	 *
+	 * For downloading and parsing xml websites
+	 * xmlDocPtr doc = xmlParseDoc(ezcurl("https://www.sitemaps.org/sitemap.xml");
+	 *
+	 * For parsing xml files
+	 * xmlDocPtr doc = xmlParseFile(docname);
+	 *
+	 * For parsing html files
+	 * xmlDocPtr doc = htmlReadFile(docname, NULL, HTML_PARSE_NOBLANKS | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING | HTML_PARSE_NONET);
+	 *
+	 * For downloading and parsing html sites */
+	xmlDocPtr doc = xmlParseDoc(ezcurl(website));
+	xmlChar *xpath = (xmlChar*) expr;
+	xmlNodeSetPtr nodeset;
+	xmlXPathObjectPtr result;
+	xmlChar *element;
+	result = getnodeset(doc,xpath);
+	**output = (char **)malloc(1);
+
+	if(result){
+		nodeset = result->nodesetval;
+		size = nodeset->nodeNr;
+		*output = malloc(size);
+		realloc(*output,size);
+		for(i=0;i<size;i++){
+			element = xmlNodeListGetString(doc,nodeset->nodeTab[i]->xmlChildrenNode,1);
+			output[i] = (char *)malloc(strlen(element));
+			printf("%s\n",element);
+			strxfrm(output[i],element,strlen(element)+1);
+			xmlFree(element);
+		}
+		xmlXPathFreeObject(result);
+	}
+
+	xmlFreeDoc(doc);
+	//xmlCleanupParser();
+	return size;
+}
 
 int extern ezXPathHTML(char *website,char *expr,char *output[]){
-	xmlInitParser();
+	//xmlInitParser();
 	int i;
-	int size;
+	int size=0;
 	/*
 	 *
 	 * xpath1 syntax for ignoring namespace
@@ -36,15 +86,15 @@ int extern ezXPathHTML(char *website,char *expr,char *output[]){
 	xmlXPathObjectPtr result;
 	xmlChar *element;
 	result = getnodeset(doc,xpath);
-	*output = malloc(0);
+	*output = (char *)malloc(1);
 
 	if(result){
 		nodeset = result->nodesetval;
 		size = nodeset->nodeNr;
-		*output = malloc(size);
+		**output = (char *)malloc(size);
 		for(i=0;i<size;i++){
 			element = xmlNodeListGetString(doc,nodeset->nodeTab[i]->xmlChildrenNode,1);
-			output[i] = malloc(strlen(element));
+			output[i] = (char *)malloc(strlen(element));
 			strxfrm(output[i],element,strlen(element)+1);
 			xmlFree(element);
 		}
@@ -52,8 +102,7 @@ int extern ezXPathHTML(char *website,char *expr,char *output[]){
 	}
 
 	xmlFreeDoc(doc);
-	xmlCleanupParser();
-
+	//xmlCleanupParser();
 	return size;
 }
 
