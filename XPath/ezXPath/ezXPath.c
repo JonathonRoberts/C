@@ -1,36 +1,25 @@
 #include <stdio.h>
 #include <libxml/xpath.h>
-#include <libxml/HTMLparser.h>/*htmlReadFile*/
+#include <libxml/HTMLparser.h>
 #include "ezcurl.c"
 
-/* An example XPath program for returning elements from an XML file */
-	/*
-	 *
-	 * xpath1 syntax for ignoring namespace
-	 * char *expr = "/*[local-name() = 'sitemapindex']/*[local-name() = 'sitemap']/*[local-name() = 'loc']";
-	 * xpath2 syntax for ignoring namespace
-	 * char *expr = "/*:sitemapindex/*:sitemap/*:loc";
-	 *
-	 * char *docname = "Sitemap.xml";
-	 *
-	 * For downloading and parsing xml websites
-	 * xmlDocPtr doc = xmlParseDoc(ezcurl("https://www.sitemaps.org/sitemap.xml");
-	 *
-	 * For parsing xml files
-	 * xmlDocPtr doc = xmlParseFile(docname);
-	 *
-	 * For parsing html files
-	 * xmlDocPtr doc = htmlReadFile(docname, NULL, HTML_PARSE_NOBLANKS | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING | HTML_PARSE_NONET);
-	 *
-	 * For downloading and parsing html sites */
+ /*
+ * Simple functions for running Xpath queries on XML and HTML
+ * return value is the number of results found
+ */
+
+int extern ezXPathXML(char *website,char *expr,char *output[]);
+int extern ezXPathXMLFile(char *file,char *expr,char *output[]);
+int extern ezXPathHTML(char *website,char *expr,char *output[]);
+int extern ezXPathHTMLFile(char *file,char *expr,char *output[]);
 
 xmlNodeSetPtr getnodeset(xmlDocPtr doc,xmlChar *xpath);
 
-int extern ezXPathXMLFile(char *file,char *expr,char *output[]){
+int extern ezXPathXML(char *website,char *expr,char *output[]){
 	xmlInitParser();
 	int i;
 	int size = 0;
-	xmlDocPtr doc = xmlParseFile(file);
+	xmlDocPtr doc = xmlReadDoc(ezcurl(website),website,NULL, 1);
 	xmlChar *xpath = (xmlChar*) expr;
 	xmlNodeSetPtr nodeset;
 	xmlXPathObjectPtr result;
@@ -55,11 +44,11 @@ int extern ezXPathXMLFile(char *file,char *expr,char *output[]){
 	return size;
 }
 
-int extern ezXPathXML(char *website,char *expr,char *output[]){
+int extern ezXPathXMLFile(char *file,char *expr,char *output[]){
 	xmlInitParser();
 	int i;
 	int size = 0;
-	xmlDocPtr doc = xmlReadDoc(ezcurl(website),website,NULL,1);
+	 xmlDocPtr doc = xmlReadFile(file, NULL, 1);
 	xmlChar *xpath = (xmlChar*) expr;
 	xmlNodeSetPtr nodeset;
 	xmlXPathObjectPtr result;
@@ -69,7 +58,7 @@ int extern ezXPathXML(char *website,char *expr,char *output[]){
 	if(result){
 		nodeset = result->nodesetval;
 		size = nodeset->nodeNr;
-		*output=malloc(size*4000);
+		*output=malloc(size);
 		for(i=0;i<size;i++){
 			element = xmlNodeListGetString(doc,nodeset->nodeTab[i]->xmlChildrenNode,1);
 			output[i] = (char *)malloc(strlen(element));
@@ -83,7 +72,6 @@ int extern ezXPathXML(char *website,char *expr,char *output[]){
 	xmlCleanupParser();
 	return size;
 }
-
 int extern ezXPathHTML(char *website,char *expr,char *output[]){
 	xmlInitParser();
 	int i;
