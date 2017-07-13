@@ -89,18 +89,14 @@ int scanwinner(char * website){
 }
 
 int footballquick(){
-	/* football page quickscrape
-	 * Known issue, segfaults if a match without odds is scanned
-	 * temp workaround is a limit on the number of matches scanned
-	 * This needs resolving in ezXPath.c
-	 */
+	/* football page quickscrape */
 	char *output[MAXELEMENTS];
 	int i;
 	int size;
 	char *website = "https://www.oddschecker.com/football";
-	char *xpath = "id('fixtures')/div/table/tbody/tr[position() < 20]/td/p/span/@data-name |\
-		id('fixtures')/div/table/tbody/tr[position() < 20]/td/@data-best-odds |\
-		id('fixtures')/div/table/tbody/tr[position() < 20]/td/a/@href";
+	char *xpath = "id('fixtures')/div/table/tbody/tr/td/p/span/@data-name |\
+		id('fixtures')/div/table/tbody/tr/td/@data-best-odds |\
+		id('fixtures')/div/table/tbody/tr/td/a/@href";
         size = ezXPathHTML(website,xpath,output);
 	int n;
 	if(size!=0){
