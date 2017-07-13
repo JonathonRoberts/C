@@ -32,7 +32,7 @@ void printstruct(int i);
 
 int main(){
 	footballquick();
-//	findraces();
+	findraces();
 	return 0;
 }
 int scanwinner(char * website){
@@ -70,6 +70,11 @@ int scanwinner(char * website){
 			free(output[i]);
 		}
 		Markets[arrno].returnodds = setreturn(Markets[arrno].noodds,Markets[arrno].odds);
+		return 1;
+	}else{
+		return 0;
+	}
+
         /*I'll have to use something like the below to find out the bookie for each outcome
         size = ezXPathHTML("https://www.oddschecker.com/football/champions-league/rijeka-v-tns/winner","id('t1')/tr/td[position() > 1 and not(position() > 26)]/@data-odig",output);
 	if(size!=0){
@@ -84,12 +89,13 @@ int scanwinner(char * website){
                 printf("\n");
 	}
         */
-	}
-	return 1;
 }
 
 int footballquick(){
-	/* football page quickscrape */
+	/* football page quickscrape
+	 * stops if an outcome is found without any odds
+	 */
+
 	char *output[MAXELEMENTS];
 	int i;
 	int size;
@@ -129,7 +135,7 @@ int footballquick(){
 
 void printstruct(int i){
    int n;
-   //printf("%s\n",Markets[i].title);
+   /*printf("%s\n",Markets[i].title);*/
       printf("%s\n",Markets[i].website);
 	/*
    for(n = 0;n<Markets[i].noodds;n++){
@@ -153,22 +159,24 @@ float setreturn(int noods, float odds[]){
 	return (1/returnodds);
 }
 int findraces(){
-	/*grab todays UK racing urls
-	* for some reason it wont load anything from course 7 with segfaulting
-	*/
+	/* grab todays UK racing urls */
 	char *output[MAXELEMENTS];
 	int i;
 	int size;
 	char *website = "https://www.oddschecker.com/horse-racing";
-	char *xpath = "id('mc')/section[1]/div/div/div/div[position()<7]/div/div/a/@href";
+	char *xpath = "id('mc')/section[1]/div/div/div/div/div/div/a/@href";
+	/* Causing segfaults when scanning this, today Epsom is 7, might be an ezcurl  issue
+	 * char *xpath = "id('mc')/section[1]/div/div/div/div[position()=7]/div/div/a/@href";
+	 */
 
         size = ezXPathHTML(website,xpath,output);
 	for(i=0;i<size;i++){
 		strcpy(Markets[arrno].website,"https://www.oddschecker.com");
 		strcat(Markets[arrno].website,output[i]);
-		scanwinner(Markets[arrno].website);
-			//printstruct(arrno++);
-		if(Markets[arrno].returnodds > 1){
+		if(scanwinner(Markets[arrno].website)==0){
+			continue;
+		}
+		else if(Markets[arrno].returnodds > 1){
 			printf("\n");
 			printstruct(arrno++);
 		}
