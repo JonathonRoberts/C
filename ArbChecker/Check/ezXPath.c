@@ -89,9 +89,18 @@ int extern ezXPathHTML(char *website,char *expr,char *output[]){
 		*output=malloc(size);
 		for(i=0;i<size;i++){
 			element = xmlNodeListGetString(doc,nodeset->nodeTab[i]->xmlChildrenNode,1);
-			output[i] = (char *)malloc(strlen(element));
-			strxfrm(output[i],element,strlen(element)+1);
-			xmlFree(element);
+			if(strlen(element) == 0){
+				strcpy(output[i] , "");
+				//printf("strlen element %d, strlen output %d\n",strlen(element),strlen(output[i]));
+				xmlFree(element);
+					;
+					}
+			else{
+				output[i] = (char *)malloc(strlen(element));
+				strxfrm(output[i],element,strlen(element)+1);
+				//printf("strlen element %d, strlen output %d\n",strlen(element),strlen(output[i]));
+				xmlFree(element);
+			}
 		}
 		xmlXPathFreeObject(result);
 	}

@@ -23,7 +23,7 @@ struct Market{
 float setreturn(int noods, float odds[]);
 int scanwinner(char * website);
 int footballquick();
-int findraces(char *races[]);
+int findraces();
 
 struct Market Markets[400];
 int arrno = 0;
@@ -31,19 +31,9 @@ int arrno = 0;
 void printstruct(int i);
 
 int main(){
-	/*
-	char *website = "https://www.oddschecker.com/football/europa-league/fc-vaduz-v-odds-ballklubb/winner";
-	scanwinner(website);
-	*/
 	footballquick();
-	/*
-	char races[500][500];
-	findraces(races);
-	int i;
-	for(i=0;i<size;i++){
-		printf("%s\n",races[i]);
-	}
-	*/
+//	findraces();
+	return 0;
 }
 int scanwinner(char * website){
 	char *output[MAXELEMENTS];
@@ -53,16 +43,24 @@ int scanwinner(char * website){
 		id('t1')/tr/@data-bname";
         size = ezXPathHTML(website,xpath,output);
 	if(size!=0){
-		printf("Found %d elements:\n",size);
 		strlcpy(Markets[arrno].website, website,120);
 		for(i =0;i<size;i++){
                         if(i%2==0){
                            Markets[arrno].noodds++;
                            if(i==0){
                               Markets[arrno].odds[i] = atof(output[i]);
+			      if(Markets[arrno].odds[i] == 9999.0){
+				   Markets[arrno].noodds--;
+				   i++;
+			      }
+
                            }
                            else{
                               Markets[arrno].odds[i/2] = atof(output[i]);
+			      if(Markets[arrno].odds[i/2] == 9999.0){
+				   Markets[arrno].noodds--;
+				   i++;
+			      }
                            }
                         }
                         else{
@@ -71,9 +69,8 @@ int scanwinner(char * website){
                            }
 			free(output[i]);
 		}
-                printstruct(arrno++);
-                printf("\n");
-        /*
+		Markets[arrno].returnodds = setreturn(Markets[arrno].noodds,Markets[arrno].odds);
+        /*I'll have to use something like the below to find out the bookie for each outcome
         size = ezXPathHTML("https://www.oddschecker.com/football/champions-league/rijeka-v-tns/winner","id('t1')/tr/td[position() > 1 and not(position() > 26)]/@data-odig",output);
 	if(size!=0){
 		printf("Found %d elements:\n",size);
@@ -95,14 +92,15 @@ int footballquick(){
 	/* football page quickscrape
 	 * Known issue, segfaults if a match without odds is scanned
 	 * temp workaround is a limit on the number of matches scanned
+	 * This needs resolving in ezXPath.c
 	 */
 	char *output[MAXELEMENTS];
 	int i;
 	int size;
 	char *website = "https://www.oddschecker.com/football";
-	char *xpath = "id('fixtures')/div/table/tbody/tr[position() < 30]/td/p/span/@data-name |\
-		id('fixtures')/div/table/tbody/tr[position() < 30]/td/@data-best-odds |\
-		id('fixtures')/div/table/tbody/tr[position() < 30]/td/a/@href";
+	char *xpath = "id('fixtures')/div/table/tbody/tr[position() < 20]/td/p/span/@data-name |\
+		id('fixtures')/div/table/tbody/tr[position() < 20]/td/@data-best-odds |\
+		id('fixtures')/div/table/tbody/tr[position() < 20]/td/a/@href";
         size = ezXPathHTML(website,xpath,output);
 	int n;
 	if(size!=0){
@@ -126,10 +124,10 @@ int footballquick(){
 			free(output[i++]);
 			if((Markets[arrno].returnodds = setreturn(Markets[arrno].noodds,Markets[arrno].odds))>1)
 				printstruct(arrno++);
-                           }
 		}
-                printf("\n");
 
+	}
+	printf("\n");
 	return 1;
 }
 
@@ -137,14 +135,15 @@ void printstruct(int i){
    int n;
    //printf("%s\n",Markets[i].title);
       printf("%s\n",Markets[i].website);
+	/*
    for(n = 0;n<Markets[i].noodds;n++){
       printf("%f - ",Markets[i].odds[n]);
       printf("%s",Markets[i].outcome[n]);
-      //printf("%s",Markets[i].bestbookie[n]);
+      printf("%s",Markets[i].bestbookie[n]);
       printf("\n");
    }
-	printf("Returnodds = %f",Markets[i].returnodds);
-      printf("\n\n");
+	*/
+	printf("Returnodds = %f\n",Markets[i].returnodds);
    //printf("sport - %c\n",Markets[i].sport);
    //printf("date - %d\n",Markets[i].date);
 }
@@ -157,24 +156,30 @@ float setreturn(int noods, float odds[]){
 	}
 	return (1/returnodds);
 }
-int findraces(char *races[]){
-	/*grab todays UK racing urls*/
+int findraces(){
+	/*grab todays UK racing urls
+	* for some reason it wont load anything from course 7 with segfaulting
+	*/
 	char *output[MAXELEMENTS];
 	int i;
 	int size;
 	char *website = "https://www.oddschecker.com/horse-racing";
-	char *xpath = "id('mc')/section[1]/div/div/div/div/div/div/a/@href";
-	char tmp[500];
+	char *xpath = "id('mc')/section[1]/div/div/div/div[position()<7]/div/div/a/@href";
 
         size = ezXPathHTML(website,xpath,output);
 	for(i=0;i<size;i++){
-		//strcpy(tmp,"https://www.oddschecker.com");
-		//printf("%s\n",output[i]);
-		//strcat(tmp,output[i]);
-		//strcpy(tmp,output[i]);
-		//strcat(tmp,0);
-		//printf("%s\n",output[i]);
-		//printf("%s\n",tmp);
-		//races[i]=tmp;
+		strcpy(Markets[arrno].website,"https://www.oddschecker.com");
+		strcat(Markets[arrno].website,output[i]);
+		scanwinner(Markets[arrno].website);
+			//printstruct(arrno++);
+		if(Markets[arrno].returnodds > 1){
+			printf("\n");
+			printstruct(arrno++);
+		}
+		else{
+			printf(".");
+			arrno++;
+		}
 	}
+	return 1;
 }
